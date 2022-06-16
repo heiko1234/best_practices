@@ -9,14 +9,14 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split, GridSearchCV
 
 
-def plotly_distribution(data, target=None, online=False):
+def plotly_distribution(data, target=None, plot=True):
     """
     Plot the distributions of all variables next to one another
 
     Inputs:
         - data: data frame with variables to plot
         - target: means any parameter in the data, can be None
-        - online False or True, False = plot
+        - plot False or True, True = plot
     """
     X_scaled = MinMaxScaler().fit_transform(data)
 
@@ -60,13 +60,14 @@ def plotly_distribution(data, target=None, online=False):
         "data": data_list,
         "layout": layout,
     }
-    if online:
-        return plotly.graph_objs.Figure(fig)
-    else:
+    if plot:
         plotly.offline.plot(fig, filename="plotly_data_distribution.html")
+        
+    else:
+        return plotly.graph_objs.Figure(fig)
 
 
-def plotly_gridsearch_heatmap(model, parameters, X, y, scoring=None, online=False):
+def plotly_gridsearch_heatmap(model, parameters, X, y, scoring=None, plot=False):
     # FRANZI: at a few places you were using "parameter" instead of "parameters".
     # this didn't result in an error here, because instead of a main loop like below
     # you've defined your variables as global variables above in the script and they
@@ -93,10 +94,10 @@ def plotly_gridsearch_heatmap(model, parameters, X, y, scoring=None, online=Fals
         )
     # fig.update_xaxes(side="top")
 
-    if online:
-        return plotly.graph_objs.Figure(fig)
-    else:
+    if plot:
         plotly.offline.plot(fig, filename="plotly_gridsearch_heatmap.html")
+    else:
+        return plotly.graph_objs.Figure(fig)
 
 
 
@@ -106,19 +107,24 @@ if __name__ == '__main__':
     import pandas as pd
     from sklearn.ensemble import RandomForestRegressor
 
-    do_path = r"path"
-    do = pd.read_csv(do_path, sep=",")
-    do = do.iloc[:, 1:]
+    do_path = r"/home/heiko/Repos/data/ChemicalPlant/ChemicalManufacturingProcess.csv"
+    do = pd.read_csv(do_path, sep=";")
+    do.head()
+    do.shape  # 176, 58
+    # do = do.iloc[:, 1:]
+
+    # do = pd.DataFrame()
+
+    # select a few indexes
 
     data = do.iloc[:, [0, 1, 15, 16, 17, 18, 19, 20]]
     data
-
     cd = data.dropna()
     cd
 
-    plotly_distribution(data=data, target=data.columns[0], online=False)
+    plotly_distribution(data=data, target=data.columns[0], plot=True)
 
-    plotly_distribution(data=data, online=False)
+    plotly_distribution(data=data, plot=True)
 
     ####
 
@@ -129,4 +135,4 @@ if __name__ == '__main__':
     parameter = {"min_samples_leaf": range(1, 11), "max_depth": range(2, 21)}
     scoring = None
 
-    plotly_gridsearch_heatmap(model=model, parameters=parameter, X=X, y=y, scoring=None, online=False)
+    plotly_gridsearch_heatmap(model=model, parameters=parameter, X=X, y=y, scoring=None, plot=True)
