@@ -1,4 +1,5 @@
 # best_practices
 
-init best practices
+Contains Code for models, plots with plotly and practical code
 
+##
